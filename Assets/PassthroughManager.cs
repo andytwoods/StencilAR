@@ -16,17 +16,17 @@ public class PassthroughManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        my_text.text = "34433 " + imageGameObject.ToString();
+        //my_text.text = "34433 " + imageGameObject.ToString();
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (OVRInput.GetDown(button, controller))
-        {
-            passthrough.hidden = !passthrough.hidden;
-        }
+        //if (OVRInput.GetDown(button, controller))
+        //{
+        //    passthrough.hidden = !passthrough.hidden;
+        //}
     }
 
     public void SetOpacity(float value)

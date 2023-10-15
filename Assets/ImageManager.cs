@@ -12,7 +12,7 @@ public class ImageManager : MonoBehaviour
     {
         retrieveInstructions.text = UrlSuffix + BaseURL();
         PlaneSetTextureAndResize();
-        //RetrieveBtn();
+        // RetrieveBtn();
     }
 
     Texture getTexture(Material material)
@@ -35,27 +35,37 @@ public class ImageManager : MonoBehaviour
     void PlaneSetTextureAndResize(Texture texture = null)
     {
         image.SetActive(false);
-        Renderer m_Renderer = image.GetComponent<Renderer>();
-        if(texture == null)
+
+        string parent_name = image.name;
+
+        Transform[] image_children = image.transform.GetComponentsInChildren<Transform>();
+
+        for (var i = 0; i < image_children.Length; i++)
         {
-            texture = getTexture(m_Renderer.material);
+
+            GameObject image_side = image_children[i].gameObject;
+            if (image_side.name == parent_name) continue;
+
+            Renderer m_Renderer = image_side.GetComponent<Renderer>();
+            if (texture == null)
+            {
+                texture = getTexture(m_Renderer.material);
+            }
+            if (texture == null)
+            {
+                Debug.Log("NO Texture on Graffiti object");
+            }
+
+            m_Renderer.material.SetTexture("_MainTex", texture);
+
+            float image_width = texture.width, image_height = texture.height;
+            float unit_dimension = .1f;
+            float image_scale_width = unit_dimension;
+            float image_scale_height = image_height / image_width * unit_dimension;
+
+            image_side.transform.localScale = new Vector3(.1f, image_scale_width, image_scale_height);
+
         }
-        if(texture == null)
-        {
-            Debug.Log("NO Texture on Graffiti object");
-        }
-
-        m_Renderer.material.SetTexture("_MainTex", texture);
-
-        float image_width = texture.width, image_height = texture.height;
-        float unit_dimension = .1f;
-        float image_scale_width = unit_dimension;
-        float image_scale_height = image_height / image_width * unit_dimension;
-
-
-        Debug.Log(image_scale_width.ToString() + " " + image_scale_height.ToString());
-        image.transform.localScale = new Vector3(.1f, image_scale_width, image_scale_height);
-
         image.SetActive(true);
     }
 
@@ -64,6 +74,7 @@ public class ImageManager : MonoBehaviour
 
     public void RetrieveBtn()
     {
+        Debug.Log("2222");
         string url = UrlSuffix + BaseURL() + "img/";
         StartCoroutine(DownloadImage(url));
     }
