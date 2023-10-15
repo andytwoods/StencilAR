@@ -88,7 +88,7 @@ public class InteractionManager : MonoBehaviour
             if (OVRInput.GetDown(button, r_controller))
             {
                 // grabbing
-                grabObject = hoverObject;
+                grabObject = checkIfParentGameObject(hoverObject);
                 GrabHoverObject(grabObject, controllerPos, controllerRot);
             }
         }
@@ -228,11 +228,20 @@ public class InteractionManager : MonoBehaviour
         {
             // use the last object, if there are multiple hits.
             // If objects overlap, this would require improvements.
-            hoverObject = hitCollider.gameObject;
+            hoverObject = checkIfParentGameObject(hitCollider.gameObject);
         }
 
     }
 
+    GameObject checkIfParentGameObject(GameObject go)
+    {
+
+        if(go.transform.parent == null)
+        {
+            return go;
+        }
+        return go.transform.parent.gameObject;
+    }
 
     // the heavy lifting code for moving objects
     void ManipulateObject(GameObject obj, Vector3 controllerPos, Quaternion controllerRot)
