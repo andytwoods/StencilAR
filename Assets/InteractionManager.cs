@@ -175,7 +175,9 @@ public class InteractionManager : MonoBehaviour
         myObj.transform.Rotate(Vector3.forward * value);
 
     }
-
+    public void TiltFixed(float value){
+        myObj.transform.Rotation
+    }
 
 
 

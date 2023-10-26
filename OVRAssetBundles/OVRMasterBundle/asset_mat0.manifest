@@ -1,0 +1,24 @@
+ManifestFileVersion: 0
+CRC: 680004536
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: ee580efa570600fc3d93e59cba0d6eb9
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: b30fce1a9ad74efb72be6c308c56e365
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Oculus/SampleFramework/Usage/Locomotion/Materials/DebugDrawLine.mat
+- Assets/Materials/Screenshot 2023-04-23 at 15.29.30.mat
+Dependencies:
+- C:/Users/jacks/StencilAR/OVRAssetBundles/OVRMasterBundle/asset_png0
+- C:/Users/jacks/StencilAR/OVRAssetBundles/OVRMasterBundle/asset_shader0
