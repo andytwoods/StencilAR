@@ -13,7 +13,15 @@ public class ImageManager : MonoBehaviour
         retrieveInstructions.text = UrlSuffix + BaseURL();
         PlaneSetTextureAndResize();
         //RetrieveBtn();
+  
     }
+
+    // below used for testing rotation issues without needing to use a headset
+    //public void Update()
+    //{
+    //    image.transform.Rotate(Vector3.up * 100 *  Time.deltaTime);
+    //}
+
 
     Texture getTexture(Material material)
     {
@@ -35,27 +43,44 @@ public class ImageManager : MonoBehaviour
     void PlaneSetTextureAndResize(Texture texture = null)
     {
         image.SetActive(false);
-        Renderer m_Renderer = image.GetComponent<Renderer>();
-        if(texture == null)
+
+        string parent_name = image.name;
+
+        Transform[] image_children = image.transform.GetComponentsInChildren<Transform>();
+
+        bool is_front = true;
+
+        for (var i = 0; i < image_children.Length; i++)
         {
-            texture = getTexture(m_Renderer.material);
+            GameObject image_side = image_children[i].gameObject;
+            if (image_side.name == parent_name) continue;
+
+            Renderer m_Renderer = image_side.GetComponent<Renderer>();
+            if (texture == null)
+            {
+                texture = getTexture(m_Renderer.material);
+            }
+
+            m_Renderer.material.SetTexture("_MainTex", texture);
+
+            float image_width = texture.width;
+            float image_height = texture.height;
+            float unit_dimension = .1f;
+            float image_scale_width = unit_dimension;
+            float image_scale_height = image_height / image_width * unit_dimension;
+
+        
+            if (is_front)
+            {
+                image_side.transform.localScale = new Vector3(.1f, image_scale_width, image_scale_height);
+                is_front = false;
+            }
+            else
+            {
+                image_side.transform.localScale = new Vector3(.1f, -image_scale_width, image_scale_height);
+            }
+
         }
-        if(texture == null)
-        {
-            Debug.Log("NO Texture on Graffiti object");
-        }
-
-        m_Renderer.material.SetTexture("_MainTex", texture);
-
-        float image_width = texture.width, image_height = texture.height;
-        float unit_dimension = .1f;
-        float image_scale_width = unit_dimension;
-        float image_scale_height = image_height / image_width * unit_dimension;
-
-
-        Debug.Log(image_scale_width.ToString() + " " + image_scale_height.ToString());
-        image.transform.localScale = new Vector3(.1f, image_scale_width, image_scale_height);
-
         image.SetActive(true);
     }
 

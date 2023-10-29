@@ -53,17 +53,17 @@ public class InteractionManager : MonoBehaviour
 
     void OrientationChanged(Toggle toggle, bool state)
     {
-        if (toggle.name == "Table")
+        if (toggle.name == "Upright")
         {
-            orientation = "table";
+            orientation = "upright";
             _rotateGameObjectX(0);
             
         }
 
 
-        else if (toggle.name == "Upright")
+        else if (toggle.name == "Table")
         {
-            orientation = "upright";
+            orientation = "table";
             _rotateGameObjectX(90);
         }
         else throw new System.Exception();
@@ -237,7 +237,6 @@ public class InteractionManager : MonoBehaviour
 
     GameObject checkIfParentGameObject(GameObject go)
     {
-
         if(go.transform.parent == null)
         {
             return go;

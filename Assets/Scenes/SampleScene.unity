@@ -2456,8 +2456,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c053399504af41a6bd1a61436187b54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 0}
+  image: {fileID: 1240312898}
   retrieveInstructions: {fileID: 2027462164}
+  speed: 20
 --- !u!4 &439201634
 Transform:
   m_ObjectHideFlags: 0
@@ -6728,7 +6729,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1240312898}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.139, y: -0.44, z: 0.035}
+  m_LocalPosition: {x: 0.106, y: 0.278, z: 0.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9939,7 +9940,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   button: 3
   controller: 96
-  imageGameObject: {fileID: 0}
+  imageGameObject: {fileID: 1240312898}
   activeImage: {fileID: 0}
   my_text: {fileID: 65284394}
 --- !u!4 &1828601337
