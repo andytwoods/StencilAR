@@ -11,16 +11,14 @@ public class ImageManager : MonoBehaviour
     void Start()
     {
         retrieveInstructions.text = UrlSuffix + BaseURL();
-        // PlaneSetTextureAndResize();
-        // RetrieveBtn();
+        PlaneSetTextureAndResize();
+        RetrieveBtn();
   
     }
 
-    public float speed = 160000f;
-
     public void Update()
     {
-        image.transform.Rotate(Vector3.right * speed * Time.deltaTime);
+        image.transform.Rotate(Vector3.up * 100 *  Time.deltaTime);
     }
 
 
@@ -49,9 +47,10 @@ public class ImageManager : MonoBehaviour
 
         Transform[] image_children = image.transform.GetComponentsInChildren<Transform>();
 
+        bool is_front = true;
+
         for (var i = 0; i < image_children.Length; i++)
         {
-
             GameObject image_side = image_children[i].gameObject;
             if (image_side.name == parent_name) continue;
 
@@ -60,19 +59,25 @@ public class ImageManager : MonoBehaviour
             {
                 texture = getTexture(m_Renderer.material);
             }
-            if (texture == null)
-            {
-                Debug.Log("NO Texture on Graffiti object");
-            }
 
             m_Renderer.material.SetTexture("_MainTex", texture);
 
-            float image_width = texture.width, image_height = texture.height;
+            float image_width = texture.width;
+            float image_height = texture.height;
             float unit_dimension = .1f;
             float image_scale_width = unit_dimension;
             float image_scale_height = image_height / image_width * unit_dimension;
 
-            image_side.transform.localScale = new Vector3(.1f, image_scale_width, image_scale_height);
+        
+            if (is_front)
+            {
+                image_side.transform.localScale = new Vector3(.1f, image_scale_width, image_scale_height);
+                is_front = false;
+            }
+            else
+            {
+                image_side.transform.localScale = new Vector3(.1f, -image_scale_width, image_scale_height);
+            }
 
         }
         image.SetActive(true);
@@ -83,7 +88,6 @@ public class ImageManager : MonoBehaviour
 
     public void RetrieveBtn()
     {
-        Debug.Log("2222");
         string url = UrlSuffix + BaseURL() + "img/";
         StartCoroutine(DownloadImage(url));
     }
