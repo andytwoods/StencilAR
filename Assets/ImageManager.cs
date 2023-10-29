@@ -11,9 +11,18 @@ public class ImageManager : MonoBehaviour
     void Start()
     {
         retrieveInstructions.text = UrlSuffix + BaseURL();
-        PlaneSetTextureAndResize();
+        // PlaneSetTextureAndResize();
         // RetrieveBtn();
+  
     }
+
+    public float speed = 160000f;
+
+    public void Update()
+    {
+        image.transform.Rotate(Vector3.right * speed * Time.deltaTime);
+    }
+
 
     Texture getTexture(Material material)
     {
