@@ -176,7 +176,7 @@ public class InteractionManager : MonoBehaviour
 
     }
     public void TiltFixed(float value){
-        myObj.transform.Rotation
+        //myObj.transform.Rotation = value;
     }
 
 
