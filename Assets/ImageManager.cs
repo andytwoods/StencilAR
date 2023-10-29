@@ -12,14 +12,15 @@ public class ImageManager : MonoBehaviour
     {
         retrieveInstructions.text = UrlSuffix + BaseURL();
         PlaneSetTextureAndResize();
-        RetrieveBtn();
+        //RetrieveBtn();
   
     }
 
-    public void Update()
-    {
-        image.transform.Rotate(Vector3.up * 100 *  Time.deltaTime);
-    }
+    // below used for testing rotation issues without needing to use a headset
+    //public void Update()
+    //{
+    //    image.transform.Rotate(Vector3.up * 100 *  Time.deltaTime);
+    //}
 
 
     Texture getTexture(Material material)
