@@ -13,10 +13,14 @@ public class InteractionManager : MonoBehaviour
     public ToggleGroup orientationToggle;
 
     public GameObject imageGameObject;
+    public GameObject rotationArrows;
+    public GameObject transformArrows;
+    public bool transformOrRotate = false;
 
     GameObject hoverObject = null;
     GameObject grabObject = null;
     GameObject prevObject = null;
+
 
     // all-purpose timer to use for blending after object is grabbed/released
     float grabTime = 0.0f;
@@ -36,7 +40,11 @@ public class InteractionManager : MonoBehaviour
 
     private void Start()
     {
-        Toggle[] toggles = orientationToggle.GetComponentsInChildren<Toggle>(); 
+        Toggle[] toggles = orientationToggle.GetComponentsInChildren<Toggle>();
+        rotationArrows = GameObject.Find("rotation-arrows");
+        transformArrows = GameObject.Find("transform-arrows");
+        rotationArrows.SetActive(false);
+        transformArrows.SetActive(false);
 
         foreach (Toggle toggle in toggles)
         {
@@ -57,7 +65,7 @@ public class InteractionManager : MonoBehaviour
         {
             orientation = "upright";
             _rotateGameObjectX(0);
-            
+
         }
 
 
@@ -67,7 +75,7 @@ public class InteractionManager : MonoBehaviour
             _rotateGameObjectX(90);
         }
         else throw new System.Exception();
-        
+
 
     }
 
@@ -76,6 +84,7 @@ public class InteractionManager : MonoBehaviour
     void Update()
     {
         Vector2 thumbstick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, r_controller);
+
         //selected.transform.Rotate(Vector3.up * -thumbstick.x);
 
         Vector3 controllerPos = OVRInput.GetLocalControllerPosition(r_controller);
@@ -92,7 +101,8 @@ public class InteractionManager : MonoBehaviour
                 GrabHoverObject(grabObject, controllerPos, controllerRot);
             }
         }
-        else {
+        else
+        {
             DeselectObject();
         }
 
@@ -106,6 +116,10 @@ public class InteractionManager : MonoBehaviour
         {
             grabTime += Time.deltaTime * 5;
             grabTime = Mathf.Clamp01(grabTime);
+            if (OVRInput.GetDown(OVRInput.Button.Two))
+            {
+                transformOrRotate = !transformOrRotate;
+            }
             ManipulateObject(grabObject, controllerPos, controllerRot);
         }
 
@@ -113,6 +127,8 @@ public class InteractionManager : MonoBehaviour
 
     void DeselectObject()
     {
+        rotationArrows.SetActive(false);
+        transformArrows.SetActive(false);
         if (grabObject) prevObject = grabObject;
         grabObject = null;
     }
@@ -128,6 +144,7 @@ public class InteractionManager : MonoBehaviour
         {
             grabObject.GetComponent<GrabObject>().Grab(r_controller);
             grabObject.GetComponent<GrabObject>().grabbedRotation = grabObject.transform.rotation;
+
 
         }
         handGrabPosition = controllerPos;
@@ -169,13 +186,14 @@ public class InteractionManager : MonoBehaviour
     public void Tilt(float value)
     {
         GameObject myObj = grabObject ? grabObject : prevObject;
-       
+
         if (!myObj) return;
 
         myObj.transform.Rotate(Vector3.forward * value);
 
     }
-    public void TiltFixed(float value){
+    public void TiltFixed(float value)
+    {
         //myObj.transform.Rotation = value;
     }
 
@@ -237,7 +255,7 @@ public class InteractionManager : MonoBehaviour
 
     GameObject checkIfParentGameObject(GameObject go)
     {
-        if(go.transform.parent == null)
+        if (go.transform.parent == null)
         {
             return go;
         }
@@ -272,9 +290,9 @@ public class InteractionManager : MonoBehaviour
                 case GrabObject.ManipulationType.DollyAttached:
                     obj.transform.position = controllerPos + controllerRot * localGrabOffset;
                     obj.transform.rotation = controllerRot * localGrabRotation;
-                    ClampGrabOffset(ref localGrabOffset, thumbstick.y);
+                    ClampGrabOffset(ref localGrabOffset, thumbstick.y, thumbstick.x);
                     break;
-               
+
                 case GrabObject.ManipulationType.Menu:
                     Vector3 targetPos = handGrabPosition + (handGrabRotation * Vector3.forward * 0.4f);
                     Quaternion targetRotation = Quaternion.LookRotation(targetPos - camGrabPosition);
@@ -290,15 +308,48 @@ public class InteractionManager : MonoBehaviour
         if (useDefaultManipulation)
         {
             obj.transform.position = controllerPos + controllerRot * localGrabOffset;
-            if (orientation == default_orientation) { obj.transform.Rotate(Vector3.forward * thumbstick.x); }
-            else obj.transform.Rotate(Vector3.up * thumbstick.x);
-            ClampGrabOffset(ref localGrabOffset, thumbstick.y);
+
+            if (transformOrRotate)
+            {
+                //Rotate
+                rotationArrows.SetActive(true);
+                transformArrows.SetActive(false);
+
+                if (orientation == default_orientation)
+                {
+                    obj.transform.Rotate(Vector3.forward * thumbstick.x);
+                    obj.transform.Rotate(Vector3.right * thumbstick.y);
+                }
+                else
+                {
+                    obj.transform.Rotate(Vector3.up * thumbstick.x);
+
+                }
+
+            }
+            else
+            {
+                //Transform
+                rotationArrows.SetActive(false);
+                transformArrows.SetActive(true);
+                ClampGrabOffset(ref localGrabOffset, thumbstick.y, thumbstick.x);
+            }
+
+
+
+
+            Quaternion target = new Quaternion(obj.transform.rotation.x, -controllerRot.y, obj.transform.rotation.z, obj.transform.rotation.w);
+            obj.transform.rotation = target;
+            rotationArrows.transform.position = obj.transform.position;
+            rotationArrows.transform.rotation = new Quaternion(rotationArrows.transform.rotation.x, -controllerRot.y, rotationArrows.transform.rotation.z, rotationArrows.transform.rotation.w);
+            transformArrows.transform.position = obj.transform.position;
+            transformArrows.transform.rotation = new Quaternion(transformArrows.transform.rotation.x, -controllerRot.y, transformArrows.transform.rotation.z, transformArrows.transform.rotation.w);
         }
     }
 
-    void ClampGrabOffset(ref Vector3 localOffset, float thumbY)
+    void ClampGrabOffset(ref Vector3 localOffset, float thumbY, float thumbX)
     {
-        Vector3 projectedGrabOffset = localOffset + Vector3.forward * thumbY * 0.01f;
+        Vector3 projectedGrabOffset = localOffset + Vector3.forward * thumbY * 0.01f + Vector3.right * thumbX * 0.01f;
         if (projectedGrabOffset.z > 0.1f)
         {
             localOffset = projectedGrabOffset;
