@@ -338,7 +338,7 @@ public class InteractionManager : MonoBehaviour
 
 
 
-            Quaternion target = new Quaternion(obj.transform.rotation.x, -controllerRot.y, obj.transform.rotation.z, obj.transform.rotation.w);
+            Quaternion target = Quaternion.Euler(obj.transform.rotation.eulerAngles.x, controllerRot.eulerAngles.y, obj.transform.rotation.eulerAngles.z);
             obj.transform.rotation = target;
             rotationArrows.transform.position = obj.transform.position;
             rotationArrows.transform.rotation = new Quaternion(rotationArrows.transform.rotation.x, -controllerRot.y, rotationArrows.transform.rotation.z, rotationArrows.transform.rotation.w);
