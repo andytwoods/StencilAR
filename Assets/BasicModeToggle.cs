@@ -18,17 +18,19 @@ public class BasicModeToggle : MonoBehaviour
         bool is_basic_mode = PlayerPrefs.GetInt(BASIC_MODE, 0) == 1; // defaults to 0
         toggle.isOn = is_basic_mode;
         ToggleBasicMode(is_basic_mode);
+        ToggleBasicMode(is_basic_mode);
     }
 
     private void SetBasicMode(Toggle toggle, bool state)
     {
-        PlayerPrefs.SetInt(BASIC_MODE, state ? 1: 0);
+        PlayerPrefs.SetInt(BASIC_MODE, state ? 1 : 0);
         ToggleBasicMode(state);
     }
 
     private void ToggleBasicMode(bool is_basic_mode)
     {
-        foreach(GameObject g in minimal_elements_to_hide) {
+        foreach (GameObject g in minimal_elements_to_hide)
+        {
             g.SetActive(is_basic_mode);
         }
     }
