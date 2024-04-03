@@ -1,19 +1,25 @@
 using System.Collections;
 using UnityEngine.Networking;
 using UnityEngine;
+using System.IO;
+using System;
 
 public class ImageManager : MonoBehaviour
 {
 
     public GameObject image;
     public TextMesh retrieveInstructions;
+    private string status = "";
+    private ImageInfo image_info;
+    private string image_url;
 
     void Start()
     {
-        retrieveInstructions.text = UrlSuffix + BaseURL();
         PlaneSetTextureAndResize();
-        //RetrieveBtn();
-  
+        SetupButton();
+        Invoke("RetrieveBtn", 1);
+        Invoke("RetrieveBtn", 3);
+        
     }
 
     // below used for testing rotation issues without needing to use a headset
@@ -21,6 +27,12 @@ public class ImageManager : MonoBehaviour
     //{
     //    image.transform.Rotate(Vector3.up * 100 *  Time.deltaTime);
     //}
+
+    void SetupButton()
+    {
+        retrieveInstructions.text = "Click 'Go!' to get a temporary web address \nwhere you can tell StencilAR where\n" +
+                                    " to find your image. You have 5 minutes\n to visit that address once you have clicked";
+    }
 
 
     Texture getTexture(Material material)
@@ -82,33 +94,124 @@ public class ImageManager : MonoBehaviour
 
         }
         image.SetActive(true);
+        image.transform.Rotate(Vector3.up * 100 *  Time.deltaTime);
     }
 
 
-    private string UrlSuffix = "www.pubpub.social/gmr/";
+    private string UrlSuffix = "http://127.0.0.1:8000/"; 
+    // "https://stencilar.com/";
 
     public void RetrieveBtn()
     {
-        string url = UrlSuffix + BaseURL() + "img/";
-        StartCoroutine(DownloadImage(url));
-    }
-
-    IEnumerator DownloadImage(string MediaUrl)
-    {
-        UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequestTexture.GetTexture(MediaUrl);
-        yield return request.SendWebRequest();
-        if (request.isNetworkError || request.isHttpError)
-            Debug.Log("NO PHOTO TO DOWNLOAD (" + MediaUrl + ") -- " + request.error);
+        if (status == "")
+        {
+            status = "requested";
+            retrieveInstructions.text = "please wait...";
+            StartCoroutine(GetCode());
+        }
+        else if (status == "requested")
+        {
+            retrieveInstructions.text = "please wait...";
+        }
+        else if (status == "good to download")
+        {
+            retrieveInstructions.text = "Click to download your image";
+            StartCoroutine(DownloadImage());
+        }
         else
         {
-            Texture texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-            PlaneSetTextureAndResize(texture);
+            throw new Exception();
+        }
 
+
+        
+        
+    }
+    
+    public class ImageInfo
+    {
+        public string code;
+        public string url;
+    }
+    
+    IEnumerator GetCode()
+    {
+        string MediaUrl = UrlSuffix + "code/" + headset_id() + "/";
+        
+        UnityEngine.Networking.UnityWebRequest request = UnityWebRequest.Get(MediaUrl);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            retrieveInstructions.text = "No success connecting\nto the backend.\nAre you connected to wifi?\nClick 'Go!' to try again";
+            status = "";
+        }
+        else
+        {
+            image_info = JsonUtility.FromJson<ImageInfo>(request.downloadHandler.text);
+            retrieveInstructions.text =
+                "Visit " + image_info.url + "\nThere, tell StencilAR where your image\nis. After, click 'Go!' to download\nthat image" +
+                " to your headset";
+            status = "good to download";
         }
     }
 
-    private string BaseURL()
+    IEnumerator DownloadImage()
     {
-        return SystemInfo.deviceUniqueIdentifier.ToString().Substring(0, 4).ToLower() + "/";
+        string MediaUrl = UrlSuffix + "img/" + headset_id() + "/";
+        
+        retrieveInstructions.text = "Requesting image link...";
+        
+        UnityEngine.Networking.UnityWebRequest request = UnityWebRequest.Get(MediaUrl);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            status = "";
+            SetupButton();
+        }
+        
+        else if (request.downloadHandler.text == "no image")
+        {
+            Debug.Log("NO PHOTO TO DOWNLOAD (" + image_url + ") -- " + request.error);
+            retrieveInstructions.text = "Could not find a url to an image!\n Please visit this location to add your url: \n" + image_info.url;
+        }
+
+        else
+        {
+            image_url = request.downloadHandler.text;
+            retrieveInstructions.text = "Retrieved image link...\nDownloading image...";
+            Debug.Log(image_url);
+            UnityEngine.Networking.UnityWebRequest image_request = UnityEngine.Networking.UnityWebRequestTexture.GetTexture(image_url);
+            yield return image_request.SendWebRequest();
+            
+            if (image_request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("1111");
+                retrieveInstructions.text = "We are having trouble opening that image.\nCan you check if it loads\nin your browser?";
+            }
+            else
+            {
+                while (!image_request.isDone)
+                {
+                    yield return image_request;
+                }
+                
+                Debug.Log("IMAGE DOWNLOAD SUCCESS");
+                Texture texture = ((DownloadHandlerTexture)image_request.downloadHandler).texture;
+                
+     
+                Debug.Log(texture);
+                retrieveInstructions.text = "Downloaded image! Download again?";
+                PlaneSetTextureAndResize(texture);
+            }
+        }
+    }
+
+
+    
+    private string headset_id()
+    {
+        return SystemInfo.deviceUniqueIdentifier.ToString().ToLower();
     }
 }
