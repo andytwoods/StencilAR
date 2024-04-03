@@ -36,19 +36,14 @@ public class InteractionManager : MonoBehaviour
     float rotationOffset = 0.0f;
     private string default_orientation = "upright";
     private string orientation = "upright";
-    private GameObject controller_right_model;
-    private GameObject BText;
-    private GameObject GrabText;
-    private GameObject ThumbstickText;
+   
 
     private void Start()
     {
         Toggle[] toggles = orientationToggle.GetComponentsInChildren<Toggle>();
         rotationArrows = GameObject.Find("rotation-arrows");
         transformArrows = GameObject.Find("transform-arrows");
-        BText = GameObject.Find("BText");
-        GrabText = GameObject.Find("GrabText");
-        ThumbstickText = GameObject.Find("ThumbstickText");
+        
         rotationArrows.SetActive(false);
         transformArrows.SetActive(false);
 
@@ -89,18 +84,14 @@ public class InteractionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        controller_right_model = GameObject.Find("quest2_controllers_div0");
+
         Vector2 thumbstick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, r_controller);
 
         //selected.transform.Rotate(Vector3.up * -thumbstick.x);
 
         Vector3 controllerPos = OVRInput.GetLocalControllerPosition(r_controller);
         Quaternion controllerRot = OVRInput.GetLocalControllerRotation(r_controller);
-        controller_right_model.transform.position = controllerPos;
-        controller_right_model.transform.rotation = controllerRot;
-        BText.transform.LookAt(Camera.main.transform);
-        GrabText.transform.LookAt(Camera.main.transform);
-        ThumbstickText.transform.LookAt(Camera.main.transform);
+       
         FindHoverObject(controllerPos, controllerRot);
 
         if (hoverObject)
