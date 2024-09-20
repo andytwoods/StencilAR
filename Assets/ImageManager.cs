@@ -98,7 +98,7 @@ public class ImageManager : MonoBehaviour
     }
 
 
-    private string UrlSuffix = "http://127.0.0.1:8000/"; 
+    private string UrlSuffix = "http://127.0.0.1:8000/"; // "https://stencilar.com/"; 
     // "https://stencilar.com/";
 
     public void RetrieveBtn()
@@ -143,7 +143,7 @@ public class ImageManager : MonoBehaviour
 
         if (request.result != UnityWebRequest.Result.Success)
         {
-            retrieveInstructions.text = "No success connecting\nto the backend.\nAre you connected to wifi?\nClick 'Go!' to try again";
+            retrieveInstructions.text = "No success connecting\nto the backend (" + UrlSuffix + ").\nAre you connected to wifi?\nClick 'Go!' to try again";
             status = "";
         }
         else
@@ -159,8 +159,8 @@ public class ImageManager : MonoBehaviour
     IEnumerator DownloadImage()
     {
         string MediaUrl = UrlSuffix + "img/" + headset_id() + "/";
-        
-        retrieveInstructions.text = "Requesting image link...";
+        Debug.Log("NO PHOTO TO DOWNLOAD (" + image_url + ") -- " + MediaUrl);
+        retrieveInstructions.text = "Requesting image link..." ;
         
         UnityEngine.Networking.UnityWebRequest request = UnityWebRequest.Get(MediaUrl);
         yield return request.SendWebRequest();
