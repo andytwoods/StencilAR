@@ -3,10 +3,11 @@ Shader "Unlit/ColorAdjust"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _Hue ("Hue", Range(-360, 360)) = 0.
-        _Brightness ("Brightness", Range(-1, 1)) = 0.
+        _Hue ("Hue", Range(-360, 360)) = 0
+        _Brightness ("Brightness", Range(-1, 1)) = 0
         _Contrast("Contrast", Range(0, 2)) = 1
         _Saturation("Saturation", Range(0, 2)) = 1
+        _Alpha ("Alpha", Range(0, 1)) = 1 // Add transparency control
     }
     SubShader
     {
@@ -36,6 +37,7 @@ Shader "Unlit/ColorAdjust"
             float _Brightness;
             float _Contrast;
             float _Saturation;
+            float _Alpha; // Add transparency variable
 
             v2f vert (appdata v)
             {
@@ -67,6 +69,9 @@ Shader "Unlit/ColorAdjust"
             {
                 float4 startColor = tex2D(_MainTex, i.uv);
                 float4 hsbColor = applyHSBEffect(startColor);
+                
+                // Apply transparency using the _Alpha property
+                hsbColor.a *= _Alpha;
 
                 return hsbColor;
             }
